@@ -1,0 +1,131 @@
+@model IEnumerable<HelpDesk.Mvc.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Filter Tickets by Status";
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1"><i class="bi bi-funnel text-primary me-2"></i>Filter Tickets by Status</h2>
+        <p class="text-secondary mb-0">Select a status to view corresponding support tickets</p>
+    </div>
+</div>
+
+<!-- Status Filter Selection (Dropdown & Radio Buttons & Navigation Links) -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <form asp-action="Filter" method="get" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <label class="form-label fw-bold">Select Status (Dropdown):</label>
+                <select name="status" asp-items="ViewBag.Statuses" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- All Statuses --</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label fw-bold d-block">Quick Filter Links:</label>
+                <div class="btn-group" role="group">
+                    <a asp-action="Filter" asp-route-status="" class="btn btn-outline-secondary btn-sm @(string.IsNullOrEmpty(selectedStatus) ? "active" : "")">All</a>
+                    <a asp-action="Filter" asp-route-status="Open" class="btn btn-outline-info btn-sm @(selectedStatus == "Open" ? "active" : "")">Open</a>
+                    <a asp-action="Filter" asp-route-status="In Progress" class="btn btn-outline-primary btn-sm @(selectedStatus == "In Progress" ? "active" : "")">In Progress</a>
+                    <a asp-action="Filter" asp-route-status="Closed" class="btn btn-outline-success btn-sm @(selectedStatus == "Closed" ? "active" : "")">Closed</a>
+                </div>
+            </div>
+            <div class="col-md-2 text-end align-self-end">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold w-100">
+                    <i class="bi bi-search me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Filter Results Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">
+            Filtered Results 
+            @if (!string.IsNullOrEmpty(selectedStatus))
+            {
+                <span class="badge bg-primary ms-2">Status: @selectedStatus</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary ms-2">All Statuses</span>
+            }
+        </h5>
+        <span class="text-muted fw-semibold">Count: @(Model?.Count() ?? 0)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Id</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Raised By</th>
+                        <th>Created Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                                <td class="fw-semibold">@item.Title</td>
+                                <td>
+                                    @if (item.Priority == "High")
+                                    {
+                                        <span class="badge bg-danger">High</span>
+                                    }
+                                    else if (item.Priority == "Medium")
+                                    {
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Low</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Status == "Open")
+                                    {
+                                        <span class="badge bg-info text-dark">Open</span>
+                                    }
+                                    else if (item.Status == "In Progress")
+                                    {
+                                        <span class="badge bg-primary">In Progress</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Closed</span>
+                                    }
+                                </td>
+                                <td>@item.RaisedBy</td>
+                                <td>@item.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end pe-4">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm me-1">Details</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm me-1">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No tickets found matching status "@selectedStatus".
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

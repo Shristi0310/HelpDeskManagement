@@ -1,0 +1,96 @@
+@model IEnumerable<HelpDesk.Mvc.Models.Ticket>
+
+@{
+    ViewData["Title"] = "All Tickets";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1"><i class="bi bi-ticket-detailed text-primary me-2"></i>All Tickets</h2>
+        <p class="text-secondary mb-0">List of all support tickets in the system</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary rounded-pill shadow-sm fw-semibold">
+        <i class="bi bi-plus-lg me-1"></i>Raise New Ticket
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Id</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Raised By</th>
+                        <th>Created Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                                <td class="fw-semibold">@item.Title</td>
+                                <td>
+                                    @if (item.Priority == "High")
+                                    {
+                                        <span class="badge bg-danger">High</span>
+                                    }
+                                    else if (item.Priority == "Medium")
+                                    {
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Low</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Status == "Open")
+                                    {
+                                        <span class="badge bg-info text-dark">Open</span>
+                                    }
+                                    else if (item.Status == "In Progress")
+                                    {
+                                        <span class="badge bg-primary">In Progress</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Closed</span>
+                                    }
+                                </td>
+                                <td>@item.RaisedBy</td>
+                                <td>@item.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end pe-4">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm me-1" title="Details">
+                                        <i class="bi bi-eye"></i> Details
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm me-1" title="Edit">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm" title="Delete">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No tickets found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
